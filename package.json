@@ -1,0 +1,20 @@
+{
+  "name": "astronomer-remote-agents",
+  "version": "1.0.0",
+  "description": "Astronomer Remote Execution Agents deployment configuration",
+  "scripts": {
+    "agents:deploy": "./deploy-agents.sh",
+    "agents:build": "docker build -f Dockerfile.remote-agent -t astro-remote-agent:latest .",
+    "agents:secrets": "kubectl apply -f astronomer/remote-agents/secrets.yaml",
+    "agents:status": "kubectl get pods -n astronomer-remote-agents",
+    "agents:logs": "kubectl logs -f deployment/astro-agent-worker -n astronomer-remote-agents",
+    "agents:scale-workers": "kubectl scale deployment astro-agent-worker --replicas=5 -n astronomer-remote-agents"
+  },
+  "keywords": [
+    "astronomer",
+    "airflow",
+    "remote-execution",
+    "kubernetes",
+    "helm"
+  ]
+}

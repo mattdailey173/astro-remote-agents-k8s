@@ -1,0 +1,45 @@
+# Custom Astronomer Remote Execution Agent Image
+# Base image from Astronomer's registry
+FROM quay.io/astronomer/astro-remote-execution-agent:latest
+
+# Switch to root for package installation
+USER root
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install additional Python packages
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Copy custom scripts or configurations
+COPY scripts/ /usr/local/bin/
+RUN chmod +x /usr/local/bin/*
+
+# Copy DAGs if needed (for testing)
+COPY dags/ /opt/airflow/dags/
+
+# Copy custom plugins
+COPY plugins/ /opt/airflow/plugins/
+
+# Set custom environment variables
+ENV CUSTOM_ENV_VAR=production
+ENV AIRFLOW__CORE__PARALLELISM=32
+ENV AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG=16
+
+# Switch back to airflow user
+USER airflow
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Labels for identification
+LABEL maintainer="your-team@company.com"
+LABEL version="1.0.0"
+LABEL description="Custom Astronomer Remote Execution Agent"

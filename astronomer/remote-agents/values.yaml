@@ -1,0 +1,142 @@
+# Astronomer Remote Execution Agent Configuration
+# Download latest from: https://github.com/astronomer/astro-remote-execution-agent
+
+# Basic Configuration
+resourceNamePrefix: "my-agent"
+namespace: "astronomer-remote-agents"
+
+# Agent Token (required)
+# Generate from Astro UI: Deployment > Remote Agents > Add Agent
+agentToken: ""  # Set via environment variable or secret
+
+# Image Configuration
+image:
+  repository: "your-registry.com/astro-remote-agent"
+  tag: "latest"
+  pullPolicy: "IfNotPresent"
+
+# Image Pull Secret for private registries
+imagePullSecretName: "astro-registry-secret"
+
+# Secret Backend Configuration
+secretBackend:
+  # Options: k8s, vault, gcp, aws
+  type: "k8s"
+
+  # Kubernetes secret backend config
+  k8s:
+    secretName: "astro-secrets"
+    namespace: "astronomer-remote-agents"
+
+  # Vault configuration (if using Vault)
+  vault:
+    endpoint: ""
+    role: ""
+    mount: ""
+    pathPrefix: ""
+
+# XCom Backend Configuration
+xcomBackend:
+  # Options: k8s, gcs, s3
+  type: "k8s"
+
+  # GCS configuration (if using GCS)
+  gcs:
+    bucket: ""
+    prefix: ""
+
+  # S3 configuration (if using S3)
+  s3:
+    bucket: ""
+    prefix: ""
+    region: ""
+
+# Agent Types Configuration
+agents:
+  # Worker Agent Configuration
+  worker:
+    enabled: true
+    replicas: 3
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  # Triggerer Agent Configuration
+  triggerer:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+# Network Configuration
+networking:
+  # Allow specific IP ranges (optional)
+  allowedIpRanges: []
+  # Example:
+  # - "10.0.0.0/8"
+  # - "192.168.1.0/24"
+
+# Monitoring and Logging
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+
+logging:
+  level: "INFO"
+  format: "json"
+
+# Security Context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# Pod Security Context
+podSecurityContext:
+  fsGroup: 1000
+
+# Service Account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# RBAC
+rbac:
+  create: true
+
+# Additional Environment Variables
+env: []
+# Example:
+# - name: CUSTOM_VAR
+#   value: "custom-value"
+
+# Additional Volumes
+volumes: []
+# Example:
+# - name: custom-volume
+#   configMap:
+#     name: custom-config
+
+# Additional Volume Mounts
+volumeMounts: []
+# Example:
+# - name: custom-volume
+#   mountPath: /custom/path
